@@ -1,18 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Group,
   Burger,
   ActionIcon,
   useMantineColorScheme,
-  useComputedColorScheme,
 } from "@mantine/core";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { MantineLogo } from "@mantine/ds";
 import classes from "./Navbar.module.css";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const links = [
   { link: "/", label: "Home" },
@@ -21,24 +21,28 @@ const links = [
 const Navbar = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const [active, setActive] = useState(links[0].link);
-  const { setColorScheme, clearColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
+  const pathname = usePathname();
 
-  const items = links.map((link) => (
-    <Link
-      key={link.label}
-      href={link.link}
-      className={classes.link}
-      data-active={active === link.link || undefined}
-      onClick={() => {
-        setActive(link.link);
-      }}
-    >
-      {link.label}
-    </Link>
-  ));
+  const { toggleColorScheme } = useMantineColorScheme();
+
+  const items = links.map((link) => {
+    const isActive =
+      (pathname.includes(link.link) && link.link.length > 1) ||
+      pathname === link.link;
+    return (
+      <Link
+        key={link.label}
+        href={link.link}
+        className={classes.link}
+        data-active={isActive || undefined}
+        onClick={() => {
+          setActive(link.link);
+        }}
+      >
+        {link.label}
+      </Link>
+    );
+  });
 
   return (
     <header className={classes.header}>
@@ -47,18 +51,13 @@ const Navbar = () => {
         <Group gap={5} visibleFrom="xs">
           {items}
           <ActionIcon
-            onClick={() =>
-              setColorScheme(computedColorScheme === "light" ? "dark" : "light")
-            }
+            onClick={() => toggleColorScheme()}
             variant="default"
             size="lg"
             aria-label="Toggle color scheme"
           >
-            {computedColorScheme === "light" ? (
-              <IconMoon stroke={1.5} />
-            ) : (
-              <IconSun stroke={1.5} />
-            )}
+            <IconMoon className={classes.moon} stroke={1.5} />
+            <IconSun className={classes.sun} stroke={1.5} />
           </ActionIcon>
         </Group>
         <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />

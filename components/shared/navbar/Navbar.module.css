@@ -35,3 +35,15 @@
     color: var(--mantine-color-white);
   }
 }
+
+.sun {
+  @mixin light {
+    display: none;
+  }
+}
+
+.moon {
+  @mixin dark {
+    display: none;
+  }
+}
